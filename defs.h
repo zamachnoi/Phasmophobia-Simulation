@@ -24,12 +24,12 @@ int randInt(int, int);          // Generates a pseudorandom integer between the 
 float randFloat(float, float);  // Generates a pseudorandom float between the parameters
 
 typedef struct {
-    char name[MAX_STR];
-    struct RoomList* neighbours;
-    struct EvidenceList* evidence;
-    struct HunterArray* hunterArr;
-    int numNeighbours;
-    int numHunters;
+    char name[MAX_STR]; //name of room
+    struct RoomList* neighbours; //list of rooms that are connected to this room
+    struct EvidenceList* evidence; //list of evidence in this room
+    struct HunterArray* hunterArr; //array of hunters in this room
+    int numHunters; //number of hunters in room
+    struct GhostType* ghost; //ghost in room
 } RoomType;
 
 typedef struct RoomNode {
@@ -40,6 +40,7 @@ typedef struct RoomNode {
 typedef struct RoomList {
     RoomNodeType* head;
     RoomNodeType* tail;
+    int size;
 } RoomListType;
 
 typedef struct {
@@ -49,7 +50,7 @@ typedef struct {
 } GhostType;
 
 typedef struct {
-    EvidenceClassType type;
+    EvidenceClassType type; // EMF, TEMPERATURE, FINGERPRINTS, SOUND
     float value;
 } EvidenceType;
 
@@ -61,24 +62,27 @@ typedef struct EvidenceNode{
 typedef struct EvidenceList {
     EvidenceNodeType *head;
     EvidenceNodeType *tail;
+    int size;
 } EvidenceListType;
 
 typedef struct {
+    char name[MAX_STR];
     RoomType* room;
-    EvidenceClassType type; 
-    EvidenceListType* evidence;
+    EvidenceClassType type;  // EMF, TEMPERATURE, FINGERPRINTS, SOUND
+    EvidenceListType* ghostlyEvidence; // list of ghostly evidence collected
+    EvidenceListType* nonGhostlyEvidence; // list of evidence collected
 } HunterType;
 
 typedef struct HunterArray {
-    int size;
-    HunterType* hunters[MAX_HUNTERS];
+    int size; // number of hunters in the array
+    HunterType* hunters[MAX_HUNTERS]; // array of pointers to hunters
 } HunterArrayType;
 
 
 typedef struct Building {
-    GhostType ghost;
-    RoomListType rooms;
-    HunterArrayType* hunterArray;
+    GhostType ghost; // the ghost
+    RoomListType rooms; //list of rooms in the building
+    HunterArrayType* hunterArray; // Array for all 4 hunters
 } BuildingType;
 
 // Room functions
@@ -93,7 +97,9 @@ void cleanupNeighbourList(RoomListType*);
 // Evidence functions
 void initEvidenceList(EvidenceListType*); // Initializes the EvidenceListType, mallocs EvidenceNodeType
 void appendEvidence(EvidenceListType*, EvidenceType*); // Appends evidence to evidencelist
-void initEvidence(EvidenceType**, EvidenceClassType, float);
+void initEvidence(EvidenceType*, EvidenceClassType, float);
+void printEvidenceList(EvidenceListType*);
+void printEvidence(EvidenceType*);
 
 // Building functi
 void initBuilding(BuildingType*);       // Initializes the building, mallocs RoomListType, EvidenceListType, HunterType
@@ -105,6 +111,17 @@ void printNeighbours(RoomNodeType*);    // Prints the neighbours of a room
 void cleanupRoomList(RoomListType*);
 void cleanupEvidenceList(EvidenceListType*);
 void cleanupRoomData(RoomType*);
+
+
+//Ghost functions
+void ghostMove(GhostType*);
+void leaveEvidence(GhostType*);
+float generateEvidence(EvidenceClassType, int);
+void moveGhostRoom(GhostType*);
+void initGhost(GhostType*, BuildingType*);
+RoomType* initGhostRoom(GhostType*, BuildingType*);
+GhostClassType initGhostType();
+void printRoom(RoomType*);
 
 
 // WHEN INIT BUILDING MALLOC ROOMLIST

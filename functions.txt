@@ -38,7 +38,7 @@ function leaveEvidence(GhostType*)
         
         float value = generateEvidence(type, 1)
 
-    initEvidence(&ev, type, value )
+    initEvidence(&ev, type, value, 1 (ghostly))
 
         POLTERGEIST: Leaves ghostly EMF, TEMPERATURE, and FINGERPRINTS
         BANSHEE: Leaves ghostly EMF, TEMPERATURE, and SOUND
@@ -74,11 +74,49 @@ function HunterMove()
         boredom = 0
     
     pick:
-        collect evidence 
-        Move
-        communicate other hunter
+        if evidence in room 
+            collect evidence  - pickupEvidence()
+        else if hunter in room
+            communicate
+        else 
+            Move
 
-function
+function pickupEvidence()
+    ---- CREATE EVIDENCE ----- 
+    ev = getEvidence(Hunter)
+    if (ev != NULL){
+       appendEvidence(ev, Hunter->ghostlyEvidence) 
+
+}
+
+// Removes evidence from list and returns it
+function getEvidence(Hunter) {
+    EvidenceNodeType* curr = Hunter->room->evidence->head
+    EvidenceNodeType* prev = NULL;
+    EvidenceNodeType* ret = NULL;
+
+    while(curr != null) {
+        // Check if type == type
+        if(Hunter->type == curr->data->type) {
+            ret = curr->data;
+            break
+        }
+        prev = cur;
+        curr = curr->next;
+    }
+
+    if(curr == NULL) { return NULL }
+    
+    if(prev == NULL) {
+        Hunter->room->evidence->head = curr->next;
+    } else {
+        prev->next = curr->next;
+    }
+    free(curr);
+    return ret;
+    
+}
+
 
 
 

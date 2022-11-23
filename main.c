@@ -7,9 +7,28 @@ int main(int argc, char *argv[])
 
     // You may change this code; this is for demonstration purposes
     BuildingType building;
+    GhostType ghost;
+
+    // Initialize the building
     initBuilding(&building);
+
+    // Initialize the ghost
+    
+
     populateRooms(&building);
-    // printtBuilding(&building);
+    initGhost(&ghost, &building);
+    printf("The ghosts room is: ");
+    printRoom(ghost.room);
+    ghostMove(&ghost);
+    ghostMove(&ghost);
+    ghostMove(&ghost);
+    printRoom(ghost.room);
+    ghostMove(&ghost);
+    ghostMove(&ghost);
+    ghostMove(&ghost);
+
+    printBuilding(&building);
+    cleanupRoomList(&building.rooms);
 
     return 0;
 }
@@ -36,7 +55,10 @@ int randInt(int min, int max)
 */
 float randFloat(float a, float b) {
     // Get a percentage between rand() and the maximum
+    // between rand() and RAND_MAX
     float random = ((float) rand()) / (float) RAND_MAX;
     // Scale it to the range we want, and shift it
     return random * (b - a) + a;
+
+
 }
