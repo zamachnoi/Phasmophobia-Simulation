@@ -106,6 +106,13 @@ void populateRooms(BuildingType* building) {
     connectRooms(kitchen, living_room);
     connectRooms(kitchen, garage);
     connectRooms(garage, utility_room);
+    printBuilding(building);
+    cleanupRoomList(&building->rooms);
+}
+
+void initRoomList(RoomListType* roomList) {
+    roomList->head = NULL;
+    roomList->tail = NULL;
 }
 
 void initRoom(RoomType* room, char* name) {
@@ -119,10 +126,7 @@ void initRoom(RoomType* room, char* name) {
     room->numNeighbours = 0;
 }
 
-void initRoomList(RoomListType* roomList) {
-    roomList->head = NULL;
-    roomList->tail = NULL;
-}
+
 
 void appendRoom(RoomListType* roomList, RoomNodeType* roomNode) {
     if (roomList->head == NULL) {
@@ -143,6 +147,8 @@ void connectRooms(RoomType* room1, RoomType* room2) {
 
     appendRoom(room1->neighbours, node2);
     appendRoom(room2->neighbours, node1);
+    room1->numNeighbours++;
+    room2->numNeighbours++;
 }
 
 void initEvidenceList(EvidenceListType* ev) {
@@ -168,3 +174,92 @@ void initBuilding(BuildingType* building) {
     building->rooms.tail = NULL;
     
 }
+
+void initEvidence(EvidenceType** ev, EvidenceClassType et, float value) {
+    *ev = calloc(1, sizeof(EvidenceType));
+    (*ev)->type = et;
+    (*ev)->value = value;
+}
+
+void printBuilding(BuildingType* building) {
+    RoomNodeType* roomNode = building->rooms.head;
+    while (roomNode != NULL) {
+        printf("%s\n", roomNode->room->name);
+        printNeighbours(roomNode);
+        roomNode = roomNode->next;
+    }
+}
+
+void printNeighbours(RoomNodeType* roomNode) {
+    RoomNodeType* neighbourNode = roomNode->room->neighbours->head;
+    while (neighbourNode != NULL) {
+        printf(" | %s", neighbourNode->room->name);
+        
+        neighbourNode = neighbourNode->next;
+    }
+    printf("\nnum neighbours: %d\n", roomNode->room->numNeighbours);
+}
+/*
+    Function: cleanupRoomList()
+     Purpose: Cleanup the data in the master list of rooms, the neighbour LIST but not the nodes or data and the room node
+*/
+void cleanupRoomList(RoomListType* roomList) {
+    RoomNodeType* roomNode = roomList->head;
+    RoomNodeType* next = NULL;
+
+    // Loop thru all nodes
+    while(roomNode != NULL) {
+
+        // Set next so we don't lose pointer
+        next = roomNode->next;
+        cleanupNeighbourList(roomNode->room->neighbours); // Cleanup the neighbour nodes
+        free(roomNode->room->neighbours); // Free the neighbour list
+        cleanupEvidenceList(roomNode->room->evidence); // Cleanup the evidence
+        free(roomNode->room->evidence); // Free the evidence list
+        free(roomNode->room); // Free the room struct
+        free(roomNode); // Free the room node
+        roomNode = next; 
+    }
+}
+
+/*
+    Function: cleaupEvidenceList()
+    Purpose: clean data and nodes for each evidence node in the list
+        in: evList() - pointer to the ev list
+*/
+void cleanupEvidenceList(EvidenceListType* evList) {
+    EvidenceNodeType* evNode = evList->head;
+    EvidenceNodeType* next = NULL;
+    while(evNode != NULL) {
+        next = evNode->next;
+        free(evNode->data);
+        free(evNode);
+        evNode = next;
+    }
+}
+
+/*
+    Function: cleanupNeighbourList()
+    Purpose: clean data and nodes for each neighbour node in the list
+        in: roomList - pointer to the room list
+*/
+
+void cleanupNeighbourList(RoomListType* roomList) {
+    RoomNodeType* roomNode = roomList->head;
+    RoomNodeType* next = NULL;
+    while(roomNode != NULL) {
+        next = roomNode->next;
+        free(roomNode);
+        roomNode = next;
+    }
+}
+
+
+// void initGhost(int id, GhostEnumType gt, RoomType *r, float like, GhostType
+// **ghost){
+//     *ghost = (GhostType*) malloc(sizeof(GhostType)); //
+//     (*ghost)->id = id;
+//     (*ghost)->likelihood = like;
+//     (*ghost)->room = r;
+//     (*ghost)->ghostType = gt;
+// }

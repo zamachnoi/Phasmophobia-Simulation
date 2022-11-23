@@ -9,6 +9,7 @@ int main(int argc, char *argv[])
     BuildingType building;
     initBuilding(&building);
     populateRooms(&building);
+    // printtBuilding(&building);
 
     return 0;
 }

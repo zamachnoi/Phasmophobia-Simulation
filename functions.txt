@@ -1,0 +1,103 @@
+
+function ghostMove()
+    if(ghost in room w/ hunter):
+        boredom = BOREDOM_MAX
+
+        CHOOSE LEAVE EVIDENCE OR NOTHING
+        return;
+
+    else:
+        boredom--
+        
+        if(boredom <= 0) {
+            end thread
+        }
+        
+        Choose:
+            Leave evidence
+            Move to adjacent room
+            do NOTHING
+        return
+
+function leaveEvidence(GhostType*)
+    EvidenceType* ev = calloc()
+    int num[3]
+
+    switch ghost->type
+        
+        case POLTERGEIST:
+            num = [EMF, TEMPERATURE, FINGERPRINTS] 
+        case BANSHEE:
+            num = [EMF, TEMPERATURE, SOUNDS]
+        case PHANTOM:
+            num = [TEMPERATURE, FINGERPRINTS, SOUNDS]
+        case BULLIES
+            num [TEMP, FINGER, SOUND]
+        
+        EvidenceClassType type = randInt(0,2)     
+        
+        float value = generateEvidence(type, 1)
+
+    initEvidence(&ev, type, value )
+
+        POLTERGEIST: Leaves ghostly EMF, TEMPERATURE, and FINGERPRINTS
+        BANSHEE: Leaves ghostly EMF, TEMPERATURE, and SOUND
+        BULLIES: Leaves ghostly EMF, FINGERPRINTS, and SOUND
+        PHANTOM: Leaves ghostly TEMPERATURE, FINGERPRINTS, and SOUND
+        
+    appendEvidence(ghost->room->evidence, ev)
+
+    
+function generateEvidence(EvidenceClassType et, int type){
+    if(et == EMF){
+        if(type == 1) return randFloat(4.7, 5.00)
+        else return randFloat(0, 4.9)
+    }else if(et == TEMPERATURE){
+        if(type == 1) return randFloat(-10.00, 1)
+        else return(0, 27)
+    }else if(et == FINGERPRINTS){
+        if (type == 1) return 1
+        else return 0
+    }else{
+        if (type ==1) return randFloat(65,75)
+        else return randFloat(40, 70)
+    }
+    }
+}
+
+
+
+
+function HunterMove()
+    if( hunter in room with ghost):
+        fear++  
+        boredom = 0
+    
+    pick:
+        collect evidence 
+        Move
+        communicate other hunter
+
+function
+
+
+
+INIT:
+    Ask user for names getNames();
+    initBuilding, populateBuildnig
+    Place hunters at van, placeHunters()
+    place ghost in random room; placeGhosts()
+    start hunt
+    initialize 1 thread for reach hunter and one thread for ghost.
+    startGame()
+
+
+EACH TURN:
+
+
+CLEANING UP:
+
+evidence:
+    in each room
+    in the hunters
+    ghost

@@ -18,6 +18,8 @@
 typedef enum { EMF, TEMPERATURE, FINGERPRINTS, SOUND } EvidenceClassType;
 typedef enum { POLTERGEIST, BANSHEE, BULLIES, PHANTOM } GhostClassType;
 
+
+
 int randInt(int, int);          // Generates a pseudorandom integer between the parameters
 float randFloat(float, float);  // Generates a pseudorandom float between the parameters
 
@@ -86,12 +88,23 @@ void initRoomList(RoomListType*);       // Initializes the RoomListType, mallocs
 void appendRoom(RoomListType*, RoomNodeType*); // Appends room to end of roomlist
 void connectRooms(RoomType*, RoomType*); // Creates new nodes and connects them together
 
+void cleanupNeighbourList(RoomListType*);
+
 // Evidence functions
 void initEvidenceList(EvidenceListType*); // Initializes the EvidenceListType, mallocs EvidenceNodeType
 void appendEvidence(EvidenceListType*, EvidenceType*); // Appends evidence to evidencelist
+void initEvidence(EvidenceType**, EvidenceClassType, float);
 
 // Building functi
 void initBuilding(BuildingType*);       // Initializes the building, mallocs RoomListType, EvidenceListType, HunterType
 void populateRooms(BuildingType*);      // Populates the building with sample data for rooms
+void printBuilding (BuildingType*);      // Prints the building
+void printNeighbours(RoomNodeType*);    // Prints the neighbours of a room
+
+
+void cleanupRoomList(RoomListType*);
+void cleanupEvidenceList(EvidenceListType*);
+void cleanupRoomData(RoomType*);
+
 
 // WHEN INIT BUILDING MALLOC ROOMLIST
