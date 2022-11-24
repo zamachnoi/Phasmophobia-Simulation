@@ -17,14 +17,23 @@ int main(int argc, char *argv[])
 
     populateRooms(&building);
     initGhost(&ghost, &building);
-    printf("The ghosts room is: ");
+    printf("The ghosts room is now in: ");
     printRoom(ghost.room);
     ghostMove(&ghost);
-    ghostMove(&ghost);
-    ghostMove(&ghost);
+    printf("The ghosts room is now in: ");
     printRoom(ghost.room);
     ghostMove(&ghost);
+    printf("The ghosts room is now in: ");
+    printRoom(ghost.room);
     ghostMove(&ghost);
+    printf("The ghosts room is now in: ");
+    printRoom(ghost.room);
+    ghostMove(&ghost);
+    printf("The ghosts room is now in: ");
+    printRoom(ghost.room);
+    ghostMove(&ghost);
+    printf("The ghosts room is now in: ");
+    printRoom(ghost.room);
     ghostMove(&ghost);
 
     printBuilding(&building);

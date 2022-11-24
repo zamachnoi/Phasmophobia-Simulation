@@ -20,13 +20,15 @@ void ghostMove(GhostType* ghost) {
 
         int randNum = randInt(0,3); // 3 options Leave evidence, move, or do nothing
         if(randNum == 0) {
+            printf("left evidence.\n");
             leaveEvidence(ghost);
             return;
         } else if (randNum == 1) {
-            
+            printf("ghost moved\n");
             moveGhostRoom(ghost);
             return;
         } else {
+            printf("Didnt move\n");
             return;
         }
         
@@ -95,7 +97,7 @@ float generateEvidence (EvidenceClassType et, int ghostly){
 void moveGhostRoom(GhostType* ghost) {
     int randRoom = randInt(0, ghost->room->neighbours->size);
     RoomNodeType* roomNode = ghost->room->neighbours->head;
-    for(int i = 0; i < randRoom; i++) {
+    for(int i = 0; i < randRoom-1; i++) {
         roomNode = roomNode->next;
     }
         ghost->room = roomNode->room;
@@ -112,7 +114,6 @@ RoomType* initGhostRoom(GhostType* ghost, BuildingType* building) {
     int randRoom = randInt(1, building->rooms.size);
     RoomNodeType* roomNode = building->rooms.head;
     for(int i = 0; i < randRoom; i++) {
-        printf("roomName %s\n", roomNode->room->name);
         roomNode = roomNode->next;
     }
     return roomNode->room;
