@@ -73,6 +73,8 @@ typedef struct {
     EvidenceClassType type;  // EMF, TEMPERATURE, FINGERPRINTS, SOUND
     EvidenceListType* ghostlyEvidence; // list of ghostly evidence collected
     EvidenceListType* nonGhostlyEvidence; // list of evidence collected
+    int fear;
+    int boredom;
 } HunterType;
 
 typedef struct HunterArray {
@@ -83,7 +85,7 @@ typedef struct HunterArray {
 
 typedef struct Building {
     GhostType ghost; // the ghost
-    RoomListType rooms; //list of rooms in the building
+    RoomListType rooms; // list of rooms in the building
     HunterArrayType* hunterArray; // Array for all 4 hunters
 } BuildingType;
 
@@ -125,5 +127,10 @@ RoomType* initGhostRoom(GhostType*, BuildingType*);
 GhostClassType initGhostType();
 void printRoom(RoomType*);
 
+// Hunter functions
+void* hunterMove(void*);
+void initHunter(HunterType*, char*, RoomType*, EvidenceClassType);
+void pickupEvidence(HunterType*);
+EvidenceType* getEvidence(HunterType*);
 
 // WHEN INIT BUILDING MALLOC ROOMLIST

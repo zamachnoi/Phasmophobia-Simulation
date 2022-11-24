@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
     // printRoom(ghost.room);
 
     // printBuilding(&building);
-    // cleanupRoomList(&building.rooms);
+    cleanupRoomList(&building.rooms);
 
     // return 0;
 }

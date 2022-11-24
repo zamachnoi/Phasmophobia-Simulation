@@ -80,26 +80,6 @@ void leaveEvidence(GhostType* ghost) {
     
 }
 
-/*
-    Function: generateEvidence()
-        Purpose: Generate a random value for the evidence (either ghostly value or not)
-            in: EvidenceClassType type, int ghostly
-*/
-float generateEvidence (EvidenceClassType et, int ghostly){
-    if(et == EMF){
-        if(ghostly == 1) return randFloat(4, 5.00);
-        else return randFloat(0, 5);
-    }else if(et == TEMPERATURE){
-        if(ghostly == 1) return randFloat(-10.00, 1);
-        else return randFloat(1.1, 10.00);
-    }else if(et == FINGERPRINTS){
-        if (ghostly == 1) return 1;
-        else return 0;
-    }else{
-        if (ghostly == 1) return randFloat(65,75);
-        else return randFloat(40, 70);
-    }
-}
 
 void moveGhostRoom(GhostType* ghost) {
 
