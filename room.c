@@ -14,6 +14,9 @@ void initRoom(RoomType* room, char* name) {
     initRoomList(room->neighbours);
     initEvidenceList(room->evidence);
 
+    // initialize semaphore
+    sem_init(&room->mutex, 0, 1);
+
     room->numHunters = 0;
     room->ghost = NULL;
 }

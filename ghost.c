@@ -1,44 +1,45 @@
 #include "defs.h"
 
-void ghostMove(GhostType* ghost) {
-    if(ghost->room->numHunters > 0) {
-        ghost->boredom = BOREDOM_MAX;
-
-        int randNum = randInt(0,2);
-
-        if(randNum) {
-            leaveEvidence(ghost);
-            return;
-        } else {
-            return;
-        }
+void *ghostMove(void* g) {
     
-    } else {
-        ghost->boredom--;
+    GhostType* ghost = (GhostType*) g;
+    while(ghost->boredom > 0) {
+        printf("%d", ghost->boredom);
 
-        
+        if(ghost->room->numHunters > 0) {
+            ghost->boredom = BOREDOM_MAX;
 
-        int randNum = randInt(0,3); // 3 options Leave evidence, move, or do nothing
-        if(randNum == 0) {
-            printf("left evidence.\n");
-            leaveEvidence(ghost);
-            return;
-        } else if (randNum == 1) {
-            printf("ghost moved\n");
-            moveGhostRoom(ghost);
-            return;
-        } else {
-            printf("Didnt move\n");
-            return;
-        }
-        
-        if(ghost->boredom <= 0) {
-            //END THREAD
-        }
+            int randNum =randInt(0,2);
+
+            if(randNum) {
+                leaveEvidence(ghost);
+                
+            } else {
+               
+            }
+    
+       } else {
+            ghost->boredom--;
+
+            int randNum = randInt(0,3); // 3 options Leave evidence, move, or do nothing
+            if(randNum == 0) {
+                printf("left evidence.\n");
+                leaveEvidence(ghost);
+            } else if (randNum == 1) {
+                printf("ghost moved\n");
+                moveGhostRoom(ghost);
+            } else {
+                printf("Didnt move\n");
+            }
+            
+       }
+        usleep(USLEEP_TIME);
     }
+    
 }
 
 void leaveEvidence(GhostType* ghost) {
+
     EvidenceType* ev = calloc(1, sizeof(EvidenceType));
     EvidenceClassType num[3];
     
@@ -64,12 +65,18 @@ void leaveEvidence(GhostType* ghost) {
             num[2] = SOUND;
             break;
     }
+    // lock room
+    sem_wait(&ghost->room->mutex);
     
     EvidenceClassType type = num[randInt(0,3)];
     float value = generateEvidence(type, 1);
 
     initEvidence(ev, type, value);
     appendEvidence(ghost->room->evidence, ev);
+
+    // unlock room
+   sem_post(&ghost->room->mutex);
+
     
 }
 
@@ -95,12 +102,32 @@ float generateEvidence (EvidenceClassType et, int ghostly){
 }
 
 void moveGhostRoom(GhostType* ghost) {
+
+    // lock the room
+    sem_wait(&ghost->room->mutex);
+
     int randRoom = randInt(0, ghost->room->neighbours->size);
     RoomNodeType* roomNode = ghost->room->neighbours->head;
     for(int i = 0; i < randRoom-1; i++) {
         roomNode = roomNode->next;
     }
-        ghost->room = roomNode->room;
+
+    RoomType* prevRoom = ghost->room;
+    RoomType* newRoom = roomNode->room;
+    
+    // lock rooms
+    sem_wait(&newRoom->mutex);
+
+    // remove ghost from previous room
+    prevRoom->ghost = NULL;
+    newRoom->ghost = (struct GhostType*) ghost;
+
+    
+    ghost->room = newRoom;
+
+    // unlock the room
+    sem_post(&ghost->room->mutex);
+    sem_post(&prevRoom->mutex);
 }
 
 void initGhost(GhostType* ghost, BuildingType* building) {

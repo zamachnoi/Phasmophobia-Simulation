@@ -2,44 +2,57 @@
 
 int main(int argc, char *argv[])
 {
-    // Initialize a random seed for the random number generators
+    BuildingType building;
+    initBuilding(&building);
+    //get the hunter names
+    char* hunterNames[MAX_HUNTERS];
+    int i;
+    // for(i = 0; i < MAX_HUNTERS; i++) {
+    //     scanf("%s", hunterNames[i]);
+    // }
+    // populate Rooms
     srand(time(NULL));
 
-    // You may change this code; this is for demonstration purposes
-    BuildingType building;
-    GhostType ghost;
-
-    // Initialize the building
-    initBuilding(&building);
-
-    // Initialize the ghost
-    
-
     populateRooms(&building);
+
+
+    //create ghost
+    GhostType ghost;
     initGhost(&ghost, &building);
-    printf("The ghosts room is now in: ");
-    printRoom(ghost.room);
-    ghostMove(&ghost);
-    printf("The ghosts room is now in: ");
-    printRoom(ghost.room);
-    ghostMove(&ghost);
-    printf("The ghosts room is now in: ");
-    printRoom(ghost.room);
-    ghostMove(&ghost);
-    printf("The ghosts room is now in: ");
-    printRoom(ghost.room);
-    ghostMove(&ghost);
-    printf("The ghosts room is now in: ");
-    printRoom(ghost.room);
-    ghostMove(&ghost);
-    printf("The ghosts room is now in: ");
-    printRoom(ghost.room);
-    ghostMove(&ghost);
-
+    printf("%d\n", ghost.type);
+    pthread_t ghostThread;
+    pthread_create(&ghostThread, NULL, ghostMove, &ghost);
+    
+    pthread_join(ghostThread, NULL);
     printBuilding(&building);
-    cleanupRoomList(&building.rooms);
 
-    return 0;
+    // populateRooms(&building);
+    // initGhost(&ghost, &building);
+    // printf("The ghosts room is now in: ");
+    // printRoom(ghost.room);
+    // ghostMove(&ghost);
+    // printf("The ghosts room is now in: ");
+    // printRoom(ghost.room);
+    // ghostMove(&ghost);
+    // printf("The ghosts room is now in: ");
+    // printRoom(ghost.room);
+    // ghostMove(&ghost);
+    // printf("The ghosts room is now in: ");
+    // printRoom(ghost.room);
+    // ghostMove(&ghost);
+    // printf("The ghosts room is now in: ");
+    // printRoom(ghost.room);
+    // ghostMove(&ghost);
+    // printf("The ghosts room is now in: ");
+    // printRoom(ghost.room);
+    // ghostMove(&ghost);
+    // printf("The ghosts room is now in: ");
+    // printRoom(ghost.room);
+
+    // printBuilding(&building);
+    // cleanupRoomList(&building.rooms);
+
+    // return 0;
 }
 
 

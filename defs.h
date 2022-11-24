@@ -3,9 +3,9 @@
 #include <string.h>
 #include <time.h>
 #include <math.h>
-// #include <unistd.h>
-// #include <pthread.h>
-// #include <semaphore.h>
+#include <unistd.h>
+#include <pthread.h>
+#include <semaphore.h>
 
 #define MAX_STR            64
 #define FEAR_RATE           1
@@ -30,6 +30,8 @@ typedef struct {
     struct HunterArray* hunterArr; //array of hunters in this room
     int numHunters; //number of hunters in room
     struct GhostType* ghost; //ghost in room
+    sem_t mutex; //mutex for room
+
 } RoomType;
 
 typedef struct RoomNode {
@@ -114,7 +116,7 @@ void cleanupRoomData(RoomType*);
 
 
 //Ghost functions
-void ghostMove(GhostType*);
+void* ghostMove(void*);
 void leaveEvidence(GhostType*);
 float generateEvidence(EvidenceClassType, int);
 void moveGhostRoom(GhostType*);
