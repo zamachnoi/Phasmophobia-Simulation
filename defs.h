@@ -108,6 +108,7 @@ void printEvidence(EvidenceType*);
 void getRandomEvidence(EvidenceListType*, EvidenceType**);
 int checkEvidence(EvidenceClassType, float);
 int checkIfHaveEvidence(HunterType*, EvidenceType*);
+int checkEvidenceThreeTypes(HunterType*);
 
 // Building functi
 void initBuilding(BuildingType*);       // Initializes the building, mallocs RoomListType, EvidenceListType, HunterType

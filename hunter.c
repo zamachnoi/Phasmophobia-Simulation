@@ -3,11 +3,13 @@
 void* hunterMove(void* h) {
 
     HunterType* hunter = (HunterType*)h;
-    
-    while(hunter->boredom > 0 && hunter->fear < 100) {
-        printf(" %s boredom: %d, fear: %d\n", hunter->name, hunter->boredom, hunter->fear);
+    int check = checkEvidenceThreeTypes(hunter);
+    while(hunter->boredom > 0 && hunter->fear < 100 && check == 0) {
+        // printf(" %s boredom: %d, fear: %d\n", hunter->name, hunter->boredom, hunter->fear);
+        //hunter room
+        printf("%s room: %s\n", hunter->name, hunter->room->name);
         if(hunter->room->ghost != NULL) {
-            hunter->fear ++;
+            hunter->fear += FEAR_RATE;
             hunter->boredom = BOREDOM_MAX;
         }
         else{
@@ -27,8 +29,15 @@ void* hunterMove(void* h) {
                 communicate(hunter);
             }
         usleep(USLEEP_TIME);
+        check = checkEvidenceThreeTypes(hunter);
     }
-        
+    if(hunter->fear >= 100) {
+        printf("%s has died of fear\n", hunter->name);
+    }
+    if(check == 1) {
+        printf("%s has found the ghost\n", hunter->name);
+    }
+    removeHunter(hunter);
 }
 
 
@@ -113,6 +122,9 @@ void getEvidence(HunterType* hunter) {
     if(hunter->room->evidence->head == NULL) {
         hunter->room->evidence->tail = NULL;
     }
+    if(hunter->room->evidence->tail == curr) {
+        hunter->room->evidence->tail = prev;
+    }
     free(curr);
 
     // Unlock room
@@ -185,6 +197,7 @@ void removeHunter(HunterType* hunter) {
                 hunter->room->hunterArr->hunters[j] = hunter->room->hunterArr->hunters[j+1];
             }
             hunter->room->hunterArr->size--;
+            printf("Room %s now has %d hunters\n", hunter->room->name, hunter->room->hunterArr->size);
             return;
         }
     }

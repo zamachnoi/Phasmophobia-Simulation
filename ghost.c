@@ -4,18 +4,16 @@ void *ghostMove(void* g) {
     
     GhostType* ghost = (GhostType*) g;
     while(ghost->boredom > 0) {
-        // printf("%d", ghost->boredom);
+        printf("ghost boredom: %d\n", ghost->boredom);
 
-        if(ghost->room->numHunters > 0) {
+        if(ghost->room->hunterArr->size > 0) {
+            printf("%s hunter array size: %d\n", ghost->room->name, ghost->room->hunterArr->size);
             ghost->boredom = BOREDOM_MAX;
 
             int randNum =randInt(0,2);
 
             if(randNum) {
-                leaveEvidence(ghost);
-                
-            } else {
-               
+                leaveEvidence(ghost);   
             }
     
        } else {

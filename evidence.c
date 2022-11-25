@@ -115,4 +115,32 @@ int checkIfHaveEvidence(HunterType* hunter, EvidenceType* ev) {
 
 }
 
-void checkEvidenceThreeTypes(HunterT)
+int checkEvidenceThreeTypes(HunterType* hunter) {
+    int EMFflag = 0;
+    int TEMPflag = 0;
+    int FINGERflag = 0;
+    int SOUNDflag = 0;
+
+    EvidenceNodeType* node = hunter->ghostlyEvidence->head;
+    while (node != NULL) {
+        if (node->data->type == EMF) {
+            EMFflag = 1;
+        } else if (node->data->type == TEMPERATURE) {
+            TEMPflag = 1;
+        } else if (node->data->type == FINGERPRINTS) {
+            FINGERflag = 1;
+        } else if (node->data->type == SOUND) {
+            SOUNDflag = 1;
+        }
+        node = node->next;
+    }
+
+    // check if 3 of the 4 flags are 1
+    if(EMFflag + TEMPflag + FINGERflag + SOUNDflag >= 3) {
+        printf("FOUND GHOST------------------------------------------------\n");
+        return 1;
+
+    } else {
+        return 0;
+    }
+}
