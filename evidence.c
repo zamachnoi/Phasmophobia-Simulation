@@ -18,6 +18,7 @@ void appendEvidence(EvidenceListType* evList, EvidenceType* ev) {
         evList->tail->next = node;
         evList->tail = node;
     }
+    evList->size++;
 }
 
 
@@ -48,7 +49,7 @@ void printEvidence(EvidenceType* ev) {
 float generateEvidence (EvidenceClassType et, int ghostly){
     if(et == EMF){
         if(ghostly == 1) return randFloat(4, 5.00);
-        else return randFloat(0, 5);
+        else if(ghostly == 0) return randFloat(0, 5);
     }else if(et == TEMPERATURE){
         if(ghostly == 1) return randFloat(-10.00, 1);
         else return randFloat(1.1, 10.00);
@@ -62,3 +63,56 @@ float generateEvidence (EvidenceClassType et, int ghostly){
 }
 
 
+int checkEvidence(EvidenceClassType et, float value){
+    // Check if evidence is ghostly
+    if(et == EMF){
+        if(value >= 4.7) return 1;
+        else return 0;
+    }else if(et == TEMPERATURE){
+        if(value <= 1) return 1;
+        else return 0;
+    }else if(et == FINGERPRINTS){
+        if(value == 1) return 1;
+        else return 0;
+    }else{
+        if(value >= 65) return 1;
+        else return 0;
+    }
+}
+
+void getRandomEvidence(EvidenceListType* list, EvidenceType** ev) {
+    if (list->size == 0) {
+        printf("ERROR: Evidence list is empty\n");
+        return;
+    }
+    int random = randInt(0, list->size);
+    EvidenceNodeType* node = list->head;
+    for(int i = 0; i < random; i++) {
+        
+        node = node->next;
+    }
+    *ev = node->data;
+    return;
+}
+
+
+int checkIfHaveEvidence(HunterType* hunter, EvidenceType* ev) {
+    EvidenceNodeType* node = hunter->ghostlyEvidence->head;
+    while (node != NULL) {
+        if (node->data == ev) {
+            return 1;
+        }
+        node = node->next;
+    }
+    node = hunter->nonGhostlyEvidence->head;
+    while (node != NULL) {
+        if (node->data == ev) {
+            return 1;
+        }
+        node = node->next;
+    }
+    return 0;
+
+}
+
+void checkEvidenceThreeTypes(Hunter)
