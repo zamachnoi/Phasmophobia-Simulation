@@ -10,10 +10,11 @@ void initRoom(RoomType* room, char* name) {
     strcpy(room->name, name);
     room->neighbours = (RoomListType*) calloc(1, sizeof(RoomListType));
     room->evidence = (EvidenceListType*) calloc(1, sizeof(EvidenceListType));
+    room->hunterArr = (HunterArrayType*) calloc(1, sizeof(HunterArrayType));
 
     initRoomList(room->neighbours);
     initEvidenceList(room->evidence);
-
+    initHunterArray(room->hunterArr);
     // initialize semaphore
     sem_init(&room->mutex, 0, 1);
 

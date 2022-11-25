@@ -4,7 +4,7 @@ void *ghostMove(void* g) {
     
     GhostType* ghost = (GhostType*) g;
     while(ghost->boredom > 0) {
-        printf("%d", ghost->boredom);
+        // printf("%d", ghost->boredom);
 
         if(ghost->room->numHunters > 0) {
             ghost->boredom = BOREDOM_MAX;
@@ -23,13 +23,13 @@ void *ghostMove(void* g) {
 
             int randNum = randInt(0,3); // 3 options Leave evidence, move, or do nothing
             if(randNum == 0) {
-                printf("left evidence.\n");
+                // printf("left evidence.\n");
                 leaveEvidence(ghost);
             } else if (randNum == 1) {
-                printf("ghost moved\n");
+                // printf("ghost moved\n");
                 moveGhostRoom(ghost);
             } else {
-                printf("Didnt move\n");
+                // printf("Didnt move\n");
             }
             
        }
@@ -74,6 +74,9 @@ void leaveEvidence(GhostType* ghost) {
     initEvidence(ev, type, value);
     appendEvidence(ghost->room->evidence, ev);
 
+    // append evidence to master list of evidence
+    appendEvidence(&ghost->building->evidence, ev);
+
     // unlock room
    sem_post(&ghost->room->mutex);
 
@@ -88,7 +91,7 @@ void moveGhostRoom(GhostType* ghost) {
 
     int randRoom = randInt(0, ghost->room->neighbours->size);
     RoomNodeType* roomNode = ghost->room->neighbours->head;
-    for(int i = 0; i < randRoom-1; i++) {
+    for(int i = 0; i < randRoom; i++) {
         roomNode = roomNode->next;
     }
 
@@ -114,6 +117,7 @@ void initGhost(GhostType* ghost, BuildingType* building) {
     
     ghost->type = initGhostType();
     ghost->room = initGhostRoom(ghost, building);
+    ghost->building = (struct Building*) building;
     ghost->boredom = BOREDOM_MAX;
 }
 
@@ -123,6 +127,7 @@ RoomType* initGhostRoom(GhostType* ghost, BuildingType* building) {
     for(int i = 0; i < randRoom; i++) {
         roomNode = roomNode->next;
     }
+    roomNode->room->ghost = (struct GhostType*) ghost;
     return roomNode->room;
     
 }
@@ -140,4 +145,5 @@ GhostClassType initGhostType() {
         case 3:
             return PHANTOM;
     }
+    return POLTERGEIST;
 }

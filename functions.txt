@@ -139,3 +139,10 @@ evidence:
     in each room
     in the hunters
     ghost
+
+
+FREES:
+
+- HUNTER ARR
+
+- EVIDENCE:

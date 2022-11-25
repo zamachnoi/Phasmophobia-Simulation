@@ -48,6 +48,7 @@ typedef struct RoomList {
 typedef struct {
     GhostClassType type;
     RoomType* room;
+    struct Building* building;
     int boredom;
 } GhostType;
 
@@ -75,6 +76,7 @@ typedef struct {
     EvidenceListType* nonGhostlyEvidence; // list of evidence collected
     int fear;
     int boredom;
+    struct Building* building;
 } HunterType;
 
 typedef struct HunterArray {
@@ -84,9 +86,8 @@ typedef struct HunterArray {
 
 
 typedef struct Building {
-    GhostType ghost; // the ghost
     RoomListType rooms; // list of rooms in the building
-    HunterArrayType* hunterArray; // Array for all 4 hunters
+    EvidenceListType evidence; // list of evidence collected
 } BuildingType;
 
 // Room functions
@@ -104,6 +105,9 @@ void appendEvidence(EvidenceListType*, EvidenceType*); // Appends evidence to ev
 void initEvidence(EvidenceType*, EvidenceClassType, float);
 void printEvidenceList(EvidenceListType*);
 void printEvidence(EvidenceType*);
+void getRandomEvidence(EvidenceListType*, EvidenceType**);
+int checkEvidence(EvidenceClassType, float);
+int checkIfHaveEvidence(HunterType*, EvidenceType*);
 
 // Building functi
 void initBuilding(BuildingType*);       // Initializes the building, mallocs RoomListType, EvidenceListType, HunterType
@@ -115,6 +119,7 @@ void printNeighbours(RoomNodeType*);    // Prints the neighbours of a room
 void cleanupRoomList(RoomListType*);
 void cleanupEvidenceList(EvidenceListType*);
 void cleanupRoomData(RoomType*);
+void cleanupEvidenceData(EvidenceListType*);
 
 
 //Ghost functions
@@ -129,8 +134,17 @@ void printRoom(RoomType*);
 
 // Hunter functions
 void* hunterMove(void*);
-void initHunter(HunterType*, char*, RoomType*, EvidenceClassType);
+void initHunter(HunterType*, char*, RoomType*, EvidenceClassType, BuildingType*);
 void pickupEvidence(HunterType*);
-EvidenceType* getEvidence(HunterType*);
+void getEvidence(HunterType*);
+void moveHunterRoom(HunterType*);
+void removeHunter(HunterType*);
+void addHunter(HunterType*);
+void communicate(HunterType*);
+void initHunterArray(HunterArrayType*);
+void printHunter(HunterType*);
+void cleanupHunter(HunterType*);
+
+void cleanupBuilding(BuildingType*);
 
 // WHEN INIT BUILDING MALLOC ROOMLIST

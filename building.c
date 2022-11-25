@@ -113,6 +113,7 @@ void populateRooms(BuildingType* building) {
 void initBuilding(BuildingType* building) {
 
     initRoomList(&building->rooms);
+    initEvidenceList(&building->evidence);
     
 }
 void printBuilding(BuildingType* building) {

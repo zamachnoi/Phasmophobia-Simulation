@@ -17,6 +17,7 @@ void cleanupRoomList(RoomListType* roomList) {
         cleanupNeighbourList(roomNode->room->neighbours); // Cleanup the neighbour nodes
         free(roomNode->room->neighbours); // Free the neighbour list
         cleanupEvidenceList(roomNode->room->evidence); // Cleanup the evidence
+        free(roomNode->room->hunterArr); // Free the hunter array
 
         //EVENTUAL WE NEED TO FUCKING FREE THE HUNTERS.
 
@@ -37,17 +38,24 @@ void cleanupEvidenceList(EvidenceListType* evList) {
     EvidenceNodeType* next = NULL;
     while(evNode != NULL) {
         next = evNode->next;
-        free(evNode->data);
         free(evNode);
         evNode = next;
     }
 }
 
+void cleanupEvidenceData(EvidenceListType* evList) {
+    EvidenceNodeType* evNode = evList->head;
+    while(evNode != NULL) {
+        free(evNode->data);
+        evNode = evNode->next;
+    }
+}
 /*
     Function: cleanupNeighbourList()
     Purpose: clean data and nodes for each neighbour node in the list
         in: roomList - pointer to the room list
 */
+
 
 void cleanupNeighbourList(RoomListType* roomList) {
     RoomNodeType* roomNode = roomList->head;
@@ -57,4 +65,19 @@ void cleanupNeighbourList(RoomListType* roomList) {
         free(roomNode);
         roomNode = next;
     }
+}
+
+void cleanupHunter(HunterType* hunter) {
+    cleanupEvidenceList(hunter->nonGhostlyEvidence);
+    cleanupEvidenceList(hunter->ghostlyEvidence);
+    free(hunter->nonGhostlyEvidence);
+    free(hunter->ghostlyEvidence);
+}
+
+void cleanupBuilding(BuildingType* building) {
+    cleanupRoomList(&building->rooms);
+    
+    cleanupEvidenceData(&building->evidence);
+    cleanupEvidenceList(&building->evidence);
+    // free(&building->evidence);
 }

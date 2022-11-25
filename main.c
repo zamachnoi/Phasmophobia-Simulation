@@ -22,35 +22,52 @@ int main(int argc, char *argv[])
     printf("%d\n", ghost.type);
     pthread_t ghostThread;
     pthread_create(&ghostThread, NULL, ghostMove, &ghost);
+
+    //create hunters
+    HunterType hunter1;
+    HunterType hunter2;
+    HunterType hunter3;
+    HunterType hunter4;
+    initHunter(&hunter1, "Hunter1", building.rooms.head->room, EMF, &building);
+    initHunter(&hunter2, "Hunter2", building.rooms.head->room, TEMPERATURE, &building);
+    initHunter(&hunter3, "Hunter3", building.rooms.head->room, FINGERPRINTS, &building);
+    initHunter(&hunter4, "Hunter4", building.rooms.head->room, SOUND, &building);
+    pthread_t hunter1Thread;
+    pthread_t hunter2Thread;
+    pthread_t hunter3Thread;
+    pthread_t hunter4Thread;
+    pthread_create(&hunter1Thread, NULL, hunterMove, &hunter1);
+    pthread_create(&hunter2Thread, NULL, hunterMove, &hunter2);
+    pthread_create(&hunter3Thread, NULL, hunterMove, &hunter3);
+    pthread_create(&hunter4Thread, NULL, hunterMove, &hunter4);
+
     
     pthread_join(ghostThread, NULL);
+    pthread_join(hunter1Thread, NULL);
+    pthread_join(hunter2Thread, NULL);
+    pthread_join(hunter3Thread, NULL);
+    pthread_join(hunter4Thread, NULL);
+
+    
+    
     printBuilding(&building);
 
-    // populateRooms(&building);
-    // initGhost(&ghost, &building);
-    // printf("The ghosts room is now in: ");
-    // printRoom(ghost.room);
-    // ghostMove(&ghost);
-    // printf("The ghosts room is now in: ");
-    // printRoom(ghost.room);
-    // ghostMove(&ghost);
-    // printf("The ghosts room is now in: ");
-    // printRoom(ghost.room);
-    // ghostMove(&ghost);
-    // printf("The ghosts room is now in: ");
-    // printRoom(ghost.room);
-    // ghostMove(&ghost);
-    // printf("The ghosts room is now in: ");
-    // printRoom(ghost.room);
-    // ghostMove(&ghost);
-    // printf("The ghosts room is now in: ");
-    // printRoom(ghost.room);
-    // ghostMove(&ghost);
-    // printf("The ghosts room is now in: ");
-    // printRoom(ghost.room);
+    printHunter(&hunter1);
+    printHunter(&hunter2);
+    printHunter(&hunter3);
+    printHunter(&hunter4);   
+
+
+   
 
     // printBuilding(&building);
-    cleanupRoomList(&building.rooms);
+    cleanupHunter(&hunter1);
+    cleanupHunter(&hunter2);
+    cleanupHunter(&hunter3);
+    cleanupHunter(&hunter4);
+
+    cleanupBuilding(&building);
+
 
     // return 0;
 }

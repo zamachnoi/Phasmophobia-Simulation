@@ -115,4 +115,4 @@ int checkIfHaveEvidence(HunterType* hunter, EvidenceType* ev) {
 
 }
 
-void checkEvidenceThreeTypes(Hunter)
+void checkEvidenceThreeTypes(HunterT)
