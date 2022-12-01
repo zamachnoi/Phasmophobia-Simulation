@@ -10,11 +10,9 @@ void* hunterMove(void* h) {
         printf("%s room: %s\n", hunter->name, hunter->room->name);
         if(hunter->room->ghost != NULL) {
             hunter->fear += FEAR_RATE;
-            hunter->boredom = BOREDOM_MAX;
         }
-        else{
-            hunter->boredom--;
-        }
+
+        hunter->boredom--;
         int rand = randInt(0,3);
 
             if(rand == 0) {
@@ -28,7 +26,7 @@ void* hunterMove(void* h) {
                 //printf("%s communicated\n", hunter->name);
                 communicate(hunter);
             }
-        usleep(USLEEP_TIME);
+         usleep(USLEEP_TIME);
         check = checkEvidenceThreeTypes(hunter);
     }
     if(hunter->fear >= 100) {
@@ -137,6 +135,7 @@ void getEvidence(HunterType* hunter) {
             appendEvidence(hunter->nonGhostlyEvidence, ret);
         } else {
             appendEvidence(hunter->ghostlyEvidence, ret);
+            hunter->boredom = BOREDOM_MAX;
         }
 }
 
