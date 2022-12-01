@@ -8,8 +8,8 @@ v:
 run:
 	./a5
 
-a5: main.o building.o ghost.o room.o hunter.o cleanup.o evidence.o
-	$(CC) -o a5 main.o building.o ghost.o room.o hunter.o cleanup.o evidence.o -lpthread
+a5: main.o building.o ghost.o room.o hunter.o cleanup.o evidence.o result.o
+	$(CC) -o a5 main.o building.o ghost.o room.o hunter.o cleanup.o evidence.o result.o -lpthread
 
 main.o: main.c defs.h
 	$(CC) -c main.c
@@ -29,7 +29,12 @@ hunter.o: hunter.c defs.h
 cleanup.o: cleanup.c defs.h
 	$(CC) -c cleanup.c
 
+result.o: result.c defs.h
+	$(CC) -c result.c
+
+evidence.o: evidence.c defs.h
+	$(CC) -c evidence.c
 
 
 clean:
-	rm -f main.o building.o ghost.o a5 room.o hunter.o cleanup.o
+	rm -f main.o building.o ghost.o a5 room.o hunter.o cleanup.o evidence.o 

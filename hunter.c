@@ -68,14 +68,14 @@ void pickupEvidence(HunterType* hunter) {
         // Append evidence to master evidence list for EZ FREEING BRO
         appendEvidence(&hunter->building->evidence, ev);
 
-
+        appendEvidence(hunter->nonGhostlyEvidence, ev);
         // Add it to corresponding hunter evidence list
-        if(checkEvidence(hunter->type, val) == 0) {
-            appendEvidence(hunter->nonGhostlyEvidence, ev);
-        } else {
-            appendEvidence(hunter->ghostlyEvidence, ev);
-            printf("ADDING FAKE GHOSTLY HERE %f\n", ev->value);
-        }
+        // if(checkEvidence(hunter->type, val) == 0) {
+        //     appendEvidence(hunter->nonGhostlyEvidence, ev);
+        // } else {
+        //     appendEvidence(hunter->ghostlyEvidence, ev);
+        //     printf("ADDING FAKE GHOSTLY HERE %f\n", ev->value);
+        // }
 
     } else {
         getEvidence(hunter);
@@ -132,7 +132,12 @@ void getEvidence(HunterType* hunter) {
     // printf("GET EV: UNLOCKED ROOM %s\n", hunter->room->name);
 
     
-    appendEvidence(hunter->ghostlyEvidence, ret);
+    // Add it to corresponding hunter evidence list
+        if(checkEvidence(ret->type, ret->value) == 0) {
+            appendEvidence(hunter->nonGhostlyEvidence, ret);
+        } else {
+            appendEvidence(hunter->ghostlyEvidence, ret);
+        }
 }
 
 

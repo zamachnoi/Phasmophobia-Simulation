@@ -66,16 +66,16 @@ float generateEvidence (EvidenceClassType et, int ghostly){
 int checkEvidence(EvidenceClassType et, float value){
     // Check if evidence is ghostly
     if(et == EMF){
-        if(value >= 4.7) return 1;
+        if(value >= 4.9) return 1;
         else return 0;
     }else if(et == TEMPERATURE){
-        if(value <= 1) return 1;
+        if(value <= 0) return 1;
         else return 0;
     }else if(et == FINGERPRINTS){
         if(value == 1) return 1;
         else return 0;
     }else{
-        if(value >= 65) return 1;
+        if(value >= 70) return 1;
         else return 0;
     }
 }

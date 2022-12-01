@@ -11,7 +11,7 @@
 #define FEAR_RATE           1
 #define MAX_FEAR          100
 #define MAX_HUNTERS         4
-#define USLEEP_TIME     50000
+#define USLEEP_TIME         0
 #define BOREDOM_MAX        99
 
 // You may rename these types if you wish
@@ -147,5 +147,13 @@ void printHunter(HunterType*);
 void cleanupHunter(HunterType*);
 
 void cleanupBuilding(BuildingType*);
+void printResults(HunterType*, HunterType*, HunterType*, HunterType*, GhostType*); 
+
 
 // WHEN INIT BUILDING MALLOC ROOMLIST
+void calculateGhost(HunterType*);
+int checkFear(HunterType*);
+
+void printResults(HunterType*, HunterType*, HunterType*, HunterType*, GhostType*);
+int checkFear(HunterType*);
+void calculateGhost(HunterType*);
