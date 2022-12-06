@@ -1,12 +1,22 @@
 #include "defs.h"
 
-
+/*
+Function: initEvidenceList()
+    Purpose: Initialize the evidence list
+        in: EvidenceListType* ev
+*/
 void initEvidenceList(EvidenceListType* ev) {
     ev->size = 0;
     ev->head = NULL;
     ev->tail = NULL;
 }
 
+/*
+Function: appendEvidence()
+    Purpose: Append evidence to the end of the evidence list
+        in: EvidenceListType* evList, EvidenceType* ev
+        out: updated evList
+*/
 void appendEvidence(EvidenceListType* evList, EvidenceType* ev) {
     EvidenceNodeType* node = calloc(1, sizeof(EvidenceNodeType));
     node->data = ev;
@@ -21,13 +31,22 @@ void appendEvidence(EvidenceListType* evList, EvidenceType* ev) {
     evList->size++;
 }
 
-
+/*
+Function: initEvidence()
+    Purpose: Initialize the evidence
+        in: EvidenceType* ev, EvidenceClassType et, float value
+        out: initialized evidence structure
+*/
 void initEvidence(EvidenceType* ev, EvidenceClassType et, float value) {
     ev->type = et;
     ev->value = value;
 }
 
-// Print evidence list contents
+/*
+Function: printEvidenceList()
+    Purpose: Print the evidence list
+        in: EvidenceListType* evList
+*/
 void printEvidenceList(EvidenceListType* evList) {
     EvidenceNodeType* node = evList->head;
     while (node != NULL) {
@@ -36,7 +55,11 @@ void printEvidenceList(EvidenceListType* evList) {
     }
 }
 
-// Print evidence contents
+/*
+Function: printEvidence()
+ Purpose: Print the evidence
+     in: EvidenceType* ev
+*/
 void printEvidence(EvidenceType* ev) {
     printf("Evidence type: %d, value: %f\n", ev->type, ev->value);
 }
@@ -62,7 +85,12 @@ float generateEvidence (EvidenceClassType et, int ghostly){
     }
 }
 
-
+/*
+Function: checkEvidence()
+ Purpose: Check if evidence is ghostly
+        in: EvidenceClassType type, float value
+    return: 1 if ghostly, 0 if not
+*/
 int checkEvidence(EvidenceClassType et, float value){
     // Check if evidence is ghostly
     if(et == EMF){
@@ -79,10 +107,14 @@ int checkEvidence(EvidenceClassType et, float value){
         else return 0;
     }
 }
-
+/*
+Function: getRandomEvidence() 
+    Purpose: Get a random evidence from the evidence list
+        in: EvidenceListType* list, EvidenceType** ev
+        out: ev, or nothing if list is empty
+*/
 void getRandomEvidence(EvidenceListType* list, EvidenceType** ev) {
     if (list->size == 0) {
-        printf("ERROR: Evidence list is empty\n");
         return;
     }
     int random = randInt(0, list->size);
@@ -95,8 +127,15 @@ void getRandomEvidence(EvidenceListType* list, EvidenceType** ev) {
     return;
 }
 
-
+/*
+Function: checkIfHaveEvidence()
+    Purpose: Check if the hunter has the evidence passed into function
+        in: HunterType* hunter, EvidenceType* ev
+        out: 1 if hunter has evidence, 0 if not
+*/
 int checkIfHaveEvidence(HunterType* hunter, EvidenceType* ev) {
+
+    // Check ghostly  evidence
     EvidenceNodeType* node = hunter->ghostlyEvidence->head;
     while (node != NULL) {
         if (node->data == ev) {
@@ -104,6 +143,8 @@ int checkIfHaveEvidence(HunterType* hunter, EvidenceType* ev) {
         }
         node = node->next;
     }
+
+    // Check non ghostly evidence
     node = hunter->nonGhostlyEvidence->head;
     while (node != NULL) {
         if (node->data == ev) {
@@ -115,6 +156,12 @@ int checkIfHaveEvidence(HunterType* hunter, EvidenceType* ev) {
 
 }
 
+/*
+Function: checkEvidenceThreeTypes()
+ Purpose: Check if the hunter has 3 of the 4 types of evidence
+        in: HunterType* hunter
+    return: 1 if hunter has 3 of the 4 types of evidence, 0 if not
+*/
 int checkEvidenceThreeTypes(HunterType* hunter) {
     int EMFflag = 0;
     int TEMPflag = 0;

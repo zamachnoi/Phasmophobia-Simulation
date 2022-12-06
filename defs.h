@@ -11,7 +11,7 @@
 #define FEAR_RATE           1
 #define MAX_FEAR          100
 #define MAX_HUNTERS         4
-#define USLEEP_TIME         0
+#define USLEEP_TIME         5000
 #define BOREDOM_MAX        99
 
 // You may rename these types if you wish

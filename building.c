@@ -110,12 +110,23 @@ void populateRooms(BuildingType* building) {
     
 }
 
+/*
+Function: initBuilding()
+ Purpose: Initialize a building by initializing the room list and evidence list
+       in: building - pointer to the building to initialize
+*/
 void initBuilding(BuildingType* building) {
 
     initRoomList(&building->rooms);
     initEvidenceList(&building->evidence);
     
 }
+
+/*
+Function: printBuilding() 
+ Purpose: Print the building by printing each room and its evidence
+       in: building - pointer to the building to print
+*/
 void printBuilding(BuildingType* building) {
     RoomNodeType* roomNode = building->rooms.head;
     while (roomNode != NULL) {
@@ -126,17 +137,11 @@ void printBuilding(BuildingType* building) {
     }
 }
 
+/*
+Function: printRoom()
+ Purpose: Print the room by printing its name
+       in: room - pointer to the room to print
+*/
 void printRoom(RoomType* room){
     printf("%s\n", room->name);
 }
-
-
-
-// void initGhost(int id, GhostEnumType gt, RoomType *r, float like, GhostType
-// **ghost){
-//     *ghost = (GhostType*) malloc(sizeof(GhostType)); //
-//     (*ghost)->id = id;
-//     (*ghost)->likelihood = like;
-//     (*ghost)->room = r;
-//     (*ghost)->ghostType = gt;
-// }

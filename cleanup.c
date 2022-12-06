@@ -55,8 +55,6 @@ void cleanupEvidenceData(EvidenceListType* evList) {
     Purpose: clean data and nodes for each neighbour node in the list
         in: roomList - pointer to the room list
 */
-
-
 void cleanupNeighbourList(RoomListType* roomList) {
     RoomNodeType* roomNode = roomList->head;
     RoomNodeType* next = NULL;
@@ -67,6 +65,12 @@ void cleanupNeighbourList(RoomListType* roomList) {
     }
 }
 
+
+/*
+    Function: cleanupHunter()
+    Purpose: clean data and nodes for each hunter node in the list
+        in: hunter - pointer to the hunter
+*/
 void cleanupHunter(HunterType* hunter) {
     cleanupEvidenceList(hunter->nonGhostlyEvidence);
     cleanupEvidenceList(hunter->ghostlyEvidence);

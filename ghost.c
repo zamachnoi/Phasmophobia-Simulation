@@ -1,13 +1,18 @@
 #include "defs.h"
 
+/*
+Function: ghostMove()
+ Purpose: This function is the main function for the ghost thread. 
+          It will pick move ghost to a random room or leave evidence in the room it is in.
+          It will also check if the ghost is bored and if it is, it will leave the house.
+        in: void* g - a void pointer to the ghost struct
+*/
 void *ghostMove(void* g) {
     
     GhostType* ghost = (GhostType*) g;
     while(ghost->boredom > 0) {
-        printf("ghost boredom: %d\n", ghost->boredom);
 
         if(ghost->room->hunterArr->size > 0) {
-            printf("%s hunter array size: %d\n", ghost->room->name, ghost->room->hunterArr->size);
             ghost->boredom = BOREDOM_MAX;
 
             int randNum =randInt(0,2);
@@ -31,11 +36,18 @@ void *ghostMove(void* g) {
             }
             
        }
-        usleep(USLEEP_TIME);
+         usleep(USLEEP_TIME);
     }
+    printf("The ghost got bored and left the house\n");
     
 }
 
+/*
+Function: leaveEvidence()
+ Purpose: This function will generate a random evidence type and value and add it to the room the ghost is in.
+        in: GhostType* ghost - a pointer to the ghost struct
+        out: updated rooms evidence list
+*/
 void leaveEvidence(GhostType* ghost) {
 
     EvidenceType* ev = calloc(1, sizeof(EvidenceType));
@@ -74,6 +86,17 @@ void leaveEvidence(GhostType* ghost) {
 
     // append evidence to master list of evidence
     appendEvidence(&ghost->building->evidence, ev);
+    
+    const char* types[] = {"EMF", "TEMPERATURE", "FINGERPRINTS", "SOUND"};
+
+    char evidenceGhostly[MAX_STR];
+
+    if (checkEvidence(ev->type, ev->value)){
+        strcpy(evidenceGhostly, "GHOSTLY");
+    } else {
+        strcpy(evidenceGhostly, "NON-GHOSTLY");
+    }
+    printf("The ghost left %s %s evidence in %s\n", evidenceGhostly, types[ev->type], ghost->room->name);
 
     // unlock room
    sem_post(&ghost->room->mutex);
@@ -81,11 +104,13 @@ void leaveEvidence(GhostType* ghost) {
     
 }
 
-
+/*
+Function: moveGhostRoom()
+ Purpose: This function will move the ghost to a random room in the building.
+        in: GhostType* ghost - a pointer to the ghost struct
+        out: updated ghost room
+*/
 void moveGhostRoom(GhostType* ghost) {
-
-    // lock the room
-    sem_wait(&ghost->room->mutex);
 
     int randRoom = randInt(0, ghost->room->neighbours->size);
     RoomNodeType* roomNode = ghost->room->neighbours->head;
@@ -95,10 +120,17 @@ void moveGhostRoom(GhostType* ghost) {
 
     RoomType* prevRoom = ghost->room;
     RoomType* newRoom = roomNode->room;
-    
-    // lock rooms
-    sem_wait(&newRoom->mutex);
 
+    // Prevent deadlock when locking rooms
+    // If the hunter's room is available for modification ,lock it
+    if(sem_trywait(&(ghost->room->mutex)) == 0) {
+        //if the new room is not available for modification, unlock the hunter's room and return nothing
+        if(sem_trywait(&(newRoom->mutex)) != 0) {
+            sem_post(&(ghost->room->mutex));
+            return;
+        }
+    }    
+    printf("The ghost moved to %s\n", newRoom->name);
     // remove ghost from previous room
     prevRoom->ghost = NULL;
     newRoom->ghost = (struct GhostType*) ghost;
@@ -111,6 +143,13 @@ void moveGhostRoom(GhostType* ghost) {
     sem_post(&prevRoom->mutex);
 }
 
+/*
+Function: initGhost() 
+ Purpose: This function will initialize the ghost struct and set the ghost's room to a random room in the building.
+        in: GhostType* ghost - a pointer to the ghost struct
+            BuildingType* building - a pointer to the building struct
+        out: updated ghost struct
+*/
 void initGhost(GhostType* ghost, BuildingType* building) {
     
     ghost->type = initGhostType();
@@ -119,6 +158,14 @@ void initGhost(GhostType* ghost, BuildingType* building) {
     ghost->boredom = BOREDOM_MAX;
 }
 
+/*
+Function: initGhostRoom() 
+ Purpose: This function will set the ghost's room to a random room in the building.
+        in: GhostType* ghost - a pointer to the ghost struct
+            BuildingType* building - a pointer to the building struct
+        out: updated ghost struct
+    return: RoomType* - a pointer to the room the ghost is in
+*/
 RoomType* initGhostRoom(GhostType* ghost, BuildingType* building) {
     int randRoom = randInt(1, building->rooms.size);
     RoomNodeType* roomNode = building->rooms.head;
@@ -130,7 +177,11 @@ RoomType* initGhostRoom(GhostType* ghost, BuildingType* building) {
     
 }
 
-
+/*
+Function: initGhostType()
+ Purpose: This function will randomly generate a ghost type.
+    return: GhostClassType - the ghost type
+*/
 GhostClassType initGhostType() {
     int randNum = randInt(0,4);
     switch(randNum) {

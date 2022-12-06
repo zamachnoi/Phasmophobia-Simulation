@@ -2,10 +2,12 @@
 
 int main(int argc, char *argv[])
 {
+    // Initialize the building
     BuildingType building;
     initBuilding(&building);
     srand(time(NULL));
 
+    // Make the hunter and ghost structs
     HunterType hunter1;
     HunterType hunter2;
     HunterType hunter3;
@@ -21,15 +23,19 @@ int main(int argc, char *argv[])
         scanf("%s", hunterNames[i]);
     }
 
+    // Add rooms to building
     populateRooms(&building);
    
+    // Initialize the hunters
     initHunter(&hunter1, hunterNames[0], building.rooms.head->room, EMF, &building);
     initHunter(&hunter2, hunterNames[1], building.rooms.head->room, TEMPERATURE, &building);
     initHunter(&hunter3, hunterNames[2], building.rooms.head->room, FINGERPRINTS, &building);
     initHunter(&hunter4, hunterNames[3], building.rooms.head->room, SOUND, &building);
 
+    // Initialize the ghost
     initGhost(&ghost, &building);
 
+    // Create the threads
     pthread_t hunter1Thread;
     pthread_t hunter2Thread;
     pthread_t hunter3Thread;
@@ -37,6 +43,7 @@ int main(int argc, char *argv[])
 
     pthread_t ghostThread;
 
+    // Start the threads
     pthread_create(&hunter1Thread, NULL, hunterMove, &hunter1);
     pthread_create(&hunter2Thread, NULL, hunterMove, &hunter2);
     pthread_create(&hunter3Thread, NULL, hunterMove, &hunter3);
@@ -44,7 +51,7 @@ int main(int argc, char *argv[])
     
     pthread_create(&ghostThread, NULL, ghostMove, &ghost);
 
-    
+    // Bring the threads back
     pthread_join(ghostThread, NULL);
     pthread_join(hunter1Thread, NULL);
     pthread_join(hunter2Thread, NULL);
@@ -52,16 +59,18 @@ int main(int argc, char *argv[])
     pthread_join(hunter4Thread, NULL);
 
     
-
+    // Print the results
     printResults(&hunter1, &hunter2, &hunter3, &hunter4, &ghost);
     
 
-   printHunter(&hunter1);
-    printHunter(&hunter2);
-    printHunter(&hunter3);
-    printHunter(&hunter4);
+//    printHunter(&hunter1);
+//     printHunter(&hunter2);
+//     printHunter(&hunter3);
+//     printHunter(&hunter4);
 
     // printBuilding(&building);
+
+    // Cleanup everything
     cleanupHunter(&hunter1);
     cleanupHunter(&hunter2);
     cleanupHunter(&hunter3);

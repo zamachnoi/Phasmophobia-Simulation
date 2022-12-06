@@ -1,32 +1,31 @@
 #include "defs.h"
 
+/*
+Function: hunterMove()
+ Purpose: This function is the main function for the hunter thread. It will
+          move the hunter to a random room, pick up evidence, and communicate
+          with other hunters. It will continue to do this until the hunter
+          has found the ghost or died of fear.
+       in: void* h - a void pointer to the hunter
+*/
 void* hunterMove(void* h) {
 
     HunterType* hunter = (HunterType*)h;
     int check = checkEvidenceThreeTypes(hunter);
     while(hunter->boredom > 0 && hunter->fear < 100 && check == 0) {
-        // printf(" %s boredom: %d, fear: %d\n", hunter->name, hunter->boredom, hunter->fear);
-        //hunter room
-        printf("%s room: %s\n", hunter->name, hunter->room->name);
         if(hunter->room->ghost != NULL) {
             hunter->fear += FEAR_RATE;
         }
-
         hunter->boredom--;
         int rand = randInt(0,3);
-
             if(rand == 0) {
-                // printf("%s moved\n", hunter->name);
                 moveHunterRoom(hunter);
-                
             } else if (rand == 1) {
-                //printf("%s picked up evidence \n", hunter->name);
                 pickupEvidence(hunter);
             } else {
-                //printf("%s communicated\n", hunter->name);
                 communicate(hunter);
             }
-         usleep(USLEEP_TIME);
+          usleep(USLEEP_TIME);
         check = checkEvidenceThreeTypes(hunter);
     }
     if(hunter->fear >= 100) {
@@ -39,7 +38,16 @@ void* hunterMove(void* h) {
 }
 
 
-
+/*
+Function: initHunter()
+ Purpose: This function initializes the hunter struct
+       in: HunterType* hunter - a pointer to the hunter
+           char* name - the name of the hunter
+           RoomType* room - the room the hunter is in (usually van)
+           EvidenceClassType et - evidence type the hunter can pick up
+           BuildingType* building - the building the hunter is in
+       out: Initialized hunter object
+*/
 void initHunter(HunterType* hunter, char* name, RoomType* room, EvidenceClassType et, BuildingType* building) {
     hunter->room = room;
     room->hunterArr->hunters[room->hunterArr->size] = hunter;
@@ -55,6 +63,13 @@ void initHunter(HunterType* hunter, char* name, RoomType* room, EvidenceClassTyp
     hunter->building = building;
 }
 
+/*
+Function: pickupEvidence()
+ Purpose: This function is called when the hunter chooses to pickup evidence in the room that it is in. If there is no evidence in the room,
+            it will generate a random piece of evidence. If there is evidence in the room, it will call the getEvidence() function.
+         in: HunterType* hunter - a pointer to the hunter
+         out: Hunter with updated evidence list
+*/
 void pickupEvidence(HunterType* hunter) {
     
     if(hunter->room->evidence->size == 0) {
@@ -67,19 +82,22 @@ void pickupEvidence(HunterType* hunter) {
         appendEvidence(&hunter->building->evidence, ev);
 
         appendEvidence(hunter->nonGhostlyEvidence, ev);
-        // Add it to corresponding hunter evidence list
-        // if(checkEvidence(hunter->type, val) == 0) {
-        //     appendEvidence(hunter->nonGhostlyEvidence, ev);
-        // } else {
-        //     appendEvidence(hunter->ghostlyEvidence, ev);
-        //     printf("ADDING FAKE GHOSTLY HERE %f\n", ev->value);
-        // }
+        const char* types[] = {"EMF", "TEMPERATURE", "FINGERPRINTS", "SOUND"};
+
+        printf("%s has picked up RANDOM %s evidence.\n", hunter->name, types[ev->type]);
 
     } else {
         getEvidence(hunter);
     }
 }
 
+/*
+Function: getEvidence()
+ Purpose: This function is called when the hunter chooses to pickup evidence in the room that it is in, if there is evidence for it to pickup.
+            It will lock the room, find and check the type of the evidence in the room, and remove it from the room. It will then unlock the room.
+         in: HunterType* hunter - a pointer to the hunter
+         out: Hunter with updated evidence list
+*/
 void getEvidence(HunterType* hunter) {
 
     // Lock room
@@ -137,17 +155,28 @@ void getEvidence(HunterType* hunter) {
             appendEvidence(hunter->ghostlyEvidence, ret);
             hunter->boredom = BOREDOM_MAX;
         }
+
+    // print that shi
+    const char* types[] = {"EMF", "TEMPERATURE", "FINGERPRINTS", "SOUND"};
+
+    char evidenceGhostly[MAX_STR];
+
+    if (checkEvidence(ret->type, ret->value)){
+        strcpy(evidenceGhostly, "GHOSTLY");
+    } else {
+        strcpy(evidenceGhostly, "NON-GHOSTLY");
+    }
+    printf("%s has picked up %s %s evidence.\n", hunter->name, evidenceGhostly, types[ret->type]);
 }
 
 
-
+/*
+Function: moveHunterRoom()
+ Purpose: This function is called when the hunter chooses to move to a random room. It will lock the room, and then move the hunter to a random room.
+         in: HunterType* hunter - a pointer to the hunter
+         out: Hunter with updated room, rooms with updated hunter pointers
+*/
 void moveHunterRoom(HunterType* hunter) {
-
-    // lock the room
-    // printf("%s MOVING FROM ROOM: %s\n", hunter->name, hunter->room->name);
-    sem_wait(&hunter->room->mutex); // old room
-    // printf("LOCKED ROOM %s\n", hunter->room->name);
-
 
     int randRoom = randInt(0, hunter->room->neighbours->size);
     RoomNodeType* roomNode = hunter->room->neighbours->head;
@@ -157,41 +186,46 @@ void moveHunterRoom(HunterType* hunter) {
 
     RoomType* prevRoom = hunter->room;
     RoomType* newRoom = roomNode->room;
-
-    // printf("%s MOVING TO ROOM: %s\n", hunter->name, newRoom->name);
-
     
     // lock rooms
-    sem_wait(&newRoom->mutex); // new room
-    // printf("LOCKED ROOM %s\n", newRoom->name);
+    // Prevent deadlock when locking rooms
+    // If the hunter's room is available for modification ,lock it
+    if(sem_trywait(&(hunter->room->mutex)) == 0) {
+        //if the new room is not available for modification, unlock the hunter's room and return nothing
+        if(sem_trywait(&(newRoom->mutex)) != 0) {
+            sem_post(&(hunter->room->mutex));
+            return;
+        }
+    }    
 
-
-    // remove hunter from prev room and add it to new room
-    
+    // Do the funky room moving
     removeHunter(hunter);
     hunter->room = newRoom;
     addHunter(hunter);
-    
-    // Add new room to hunter
- 
-    
 
-    // unlock the room
-    
+    // Unlock it
     sem_post(&prevRoom->mutex);
-    // printf("UNLOCKED ROOM %s\n", prevRoom->name);
-
     sem_post(&hunter->room->mutex);
-    // printf("UNLOCKED ROOM %s\n", hunter->room->name); // new room
     
 }
 
+/*
+Function: addHunter()
+ Purpose: This function adds a hunter to the hunter array in the room that it is in.
+         in: HunterType* hunter - a pointer to the hunter
+         out: Updated room with hunter pointer
+*/
 void addHunter(HunterType* hunter) {
     hunter->room->hunterArr->hunters[hunter->room->hunterArr->size] = hunter;
     hunter->room->hunterArr->size++;
-    //printf("Room %s now has %d hunters\n", hunter->room->name, hunter->room->hunterArr->size);
 }
 
+/*
+Function: removeHunter()
+ Purpose: This function removes a hunter from the hunter array in the room that it is in.
+         in: HunterType* hunter - a pointer to the hunter
+         out: Updated room with hunter pointer
+*/
 void removeHunter(HunterType* hunter) {
     for(int i = 0; i < hunter->room->hunterArr->size; i++) {
         if(hunter->room->hunterArr->hunters[i] == hunter) {
@@ -200,27 +234,32 @@ void removeHunter(HunterType* hunter) {
             for(int j = i; j < hunter->room->hunterArr->size-1; j++) {
                 hunter->room->hunterArr->hunters[j] = hunter->room->hunterArr->hunters[j+1];
             }
+
+            // LOWER THE SIZE@!!
             hunter->room->hunterArr->size--;
-            printf("Room %s now has %d hunters\n", hunter->room->name, hunter->room->hunterArr->size);
             return;
         }
     }
     
 }   
 
+/*
+Function: communicate()
+ Purpose: This function is called when the hunter chooses to communicate with another hunter. It will lock the room, and then pick a random hunter in the room to communicate with.
+         in: HunterType* hunter - a pointer to the hunter
+*/
 void communicate(HunterType* hunter) {
     
     // Lock room
-    sem_wait(&hunter->room->mutex);
+    // sem_wait(&hunter->room->mutex);
 
-    // Pick random hunter in the room
-    //printf("%s ROOM SIZE: %d\n", hunter->room->name, hunter->room->hunterArr->size);
-
+    // Unlock room and return if theres no other hunter to communicate with
     if(hunter->room->hunterArr->size == 1) {
-        sem_post(&hunter->room->mutex);
+        // sem_post(&hunter->room->mutex);
         return;
     }
 
+    // Get random hunter to communicate with
     int randHunter = randInt(0, hunter->room->hunterArr->size);
     while(hunter->room->hunterArr->hunters[randHunter] == hunter) {
         randHunter = randInt(0, hunter->room->hunterArr->size);
@@ -229,38 +268,50 @@ void communicate(HunterType* hunter) {
     HunterType* otherHunter = hunter->room->hunterArr->hunters[randHunter];
 
     
-
+    // Get random evidence from the hunter communicating
     EvidenceType* ev = NULL;
     getRandomEvidence(hunter->ghostlyEvidence, &ev);
+
+    // If hunter doesnt have evidence to give, unlock room and return
     if(ev == NULL) {
-        // printf("bruh this does not work\n");
+        // Unlock room
+        // sem_post(&hunter->room->mutex);
+        return;
     } else {
+
+        // Give evidence to other hunter
         if(checkIfHaveEvidence(otherHunter, ev) == 0) {
             printf("Hunter %s gave evidence to hunter %s\n", hunter->name, otherHunter->name);
             appendEvidence(otherHunter->ghostlyEvidence, ev);
-        }
-        
-    }
+            
 
+            // Print that shit 
+            const char* types[] = {"EMF", "TEMPERATURE", "FINGERPRINTS", "SOUND"};
+
+            char evidenceGhostly[MAX_STR];
+
+            if (checkEvidence(ev->type, ev->value)){
+                strcpy(evidenceGhostly, "GHOSTLY");
+            } else {
+                strcpy(evidenceGhostly, "NON-GHOSTLY");
+            }
+            printf("%s has shared %s %s evidence with %s.\n", hunter->name, evidenceGhostly, types[ev->type], otherHunter->name);
+        }
+    }
     // Unlock room
-    sem_post(&hunter->room->mutex);
-    
+    //sem_post(&hunter->room->mutex);   
 }
 
+/*
+Function: initHunterArray()
+ Purpose: This function initializes the hunter array.
+         in: HunterArrayType* hunterArr - a pointer to the hunter array
+*/
 void initHunterArray(HunterArrayType* hunterArr) {
     hunterArr->size = 0;
 }
 
-
-//NEXT TIME:
-/*
-- communicate evidence
-    - make sure not duplicate data
-    - share pointer
-    
-    When freeing evidence, make sure to set to NULL 
-*/
-
+// Function to print a hunter
 void printHunter(HunterType* hunter ) {
     printf("Hunter: %s, Room: %s, Boredom: %d, Fear: %d\n", hunter->name, hunter->room->name, hunter->boredom, hunter->fear);
     printf("Ghostly Evidence: \n");
