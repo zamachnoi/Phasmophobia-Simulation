@@ -1,40 +1,29 @@
 CC=gcc
+CFLAGS=-Wno-deprecated-declarations -Wno-return-type
+SRC_DIR=src
+BUILD_DIR=build
 
-all: a5 run
+# List of source files
+SOURCES := $(wildcard $(SRC_DIR)/*.c)
+# Replace source directory with build directory and change extension to .o
+OBJECTS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SOURCES))
+
+all: simulation run
 
 v:
-	valgrind ./a5
+	valgrind ./simulation
 
 run:
-	./a5
+	./simulation
 
-a5: main.o building.o ghost.o room.o hunter.o cleanup.o evidence.o result.o
-	$(CC) -o a5 main.o building.o ghost.o room.o hunter.o cleanup.o evidence.o result.o -lpthread
+# Change the target name to 'simulation'
+simulation: $(OBJECTS)
+	$(CC) -o $@ $^ -lpthread
 
-main.o: main.c defs.h
-	$(CC) -c main.c
-
-building.o: building.c defs.h
-	$(CC) -c building.c
-
-ghost.o: ghost.c defs.h
-	$(CC) -c ghost.c
-
-room.o: room.c defs.h
-	$(CC) -c room.c
-
-hunter.o: hunter.c defs.h
-	$(CC) -c hunter.c
-
-cleanup.o: cleanup.c defs.h
-	$(CC) -c cleanup.c
-
-result.o: result.c defs.h
-	$(CC) -c result.c
-
-evidence.o: evidence.c defs.h
-	$(CC) -c evidence.c
-
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
+	mkdir -p $(BUILD_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f main.o building.o ghost.o a5 room.o hunter.o cleanup.o evidence.o 
+	rm -f $(BUILD_DIR)/*.o
+	rm -f simulation
